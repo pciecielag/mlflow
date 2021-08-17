@@ -66,7 +66,14 @@ class SFTPArtifactRepository(ArtifactRepository):
 
             if "identityfile" in user_config:
                 self.config["private_key"] = user_config["identityfile"][0]
-
+                
+            agent = paramiko.Agent()
+            agent_keys = agent.get_keys()
+            if agent_keys:
+                self.config["private_key"] = agent_keys[0]
+            elif "identityfile" in user_config:
+                self.config["private_key"] = user_config["identityfile"][0]
+                
             self.sftp = pysftp.Connection(**self.config)
 
         super().__init__(artifact_uri)
